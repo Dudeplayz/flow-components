@@ -212,7 +212,7 @@ public class SplitLayout extends Component
      * 0 and 100. The value will be null unless the splitter position has been
      * explicitly set on the server-side, or the splitter has been moved on the
      * client side. The splitter position is automatically updated when as part
-     * of the {@link SplitterDragendEvent}.
+     * of the {@link SplitterDragEndEvent}.
      *
      * @return the splitter position, may be null
      */
@@ -341,6 +341,7 @@ public class SplitLayout extends Component
     }
 
     @DomEvent("splitter-dragend")
+    @Deprecated(forRemoval = true, since = "24.x.x")
     public static class SplitterDragendEvent
             extends ComponentEvent<SplitLayout> {
 
@@ -360,6 +361,26 @@ public class SplitLayout extends Component
 
     }
 
+    @DomEvent("splitter-dragend")
+    public static class SplitterDragEndEvent
+            extends ComponentEvent<SplitLayout> {
+
+        private static final String PRIMARY_FLEX_BASIS = "element.querySelector(':scope > [slot=\"primary\"]').style.flexBasis";
+        private static final String SECONDARY_FLEX_BASIS = "element.querySelector(':scope > [slot=\"secondary\"]').style.flexBasis";
+
+        String primaryComponentFlexBasis;
+        String secondaryComponentFlexBasis;
+
+        public SplitterDragEndEvent(SplitLayout source, boolean fromClient,
+                                    @EventData(PRIMARY_FLEX_BASIS) String primaryComponentFlexBasis,
+                                    @EventData(SECONDARY_FLEX_BASIS) String secondaryComponentFlexBasis) {
+            super(source, fromClient);
+            this.primaryComponentFlexBasis = primaryComponentFlexBasis;
+            this.secondaryComponentFlexBasis = secondaryComponentFlexBasis;
+        }
+
+    }
+
     /**
      * Adds a listener for the {@code splitter-dragend} event, which is fired
      * when the user has stopped resizing the splitter with drag and drop.
@@ -368,9 +389,24 @@ public class SplitLayout extends Component
      *            the listener to add
      * @return a registration for removing the listener
      */
+    @Deprecated(forRemoval = true, since = "24.x.x")
     public Registration addSplitterDragendListener(
             ComponentEventListener<SplitterDragendEvent> listener) {
         return addListener(SplitterDragendEvent.class,
+                (ComponentEventListener) listener);
+    }
+
+    /**
+     * Adds a listener for the {@code splitter-dragend} event, which is fired
+     * when the user has stopped resizing the splitter with drag and drop.
+     *
+     * @param listener
+     *            the listener to add
+     * @return a registration for removing the listener
+     */
+    public Registration addSplitterDragEndListener(
+            ComponentEventListener<SplitterDragendEvent> listener) {
+        return addListener(SplitterDragEndEvent.class,
                 (ComponentEventListener) listener);
     }
 
